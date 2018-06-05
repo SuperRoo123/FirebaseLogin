@@ -1,12 +1,10 @@
 import { Component } from '@angular/core';
-import {
-  Alert,
+import {  Alert,
   AlertController,
   IonicPage,
-  Loading,
-  LoadingController,
-  NavController
+  Loading, LoadingController,NavController, NavParams
 } from 'ionic-angular';
+
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { EmailValidator } from '../../validators/email';
 import { AuthProvider } from '../../providers/auth/auth';
@@ -18,35 +16,25 @@ import { HomePage } from '../home/home';
   templateUrl: 'login.html',
 })
 export class LoginPage {
+
   public loginForm: FormGroup;
-public loading: Loading;
-  constructor(
-    public navCtrl: NavController,
-    public loadingCtrl: LoadingController,
+  public loading: Loading;
+
+  constructor(public navCtrl: NavController, public loadingCtrl: LoadingController,
     public alertCtrl: AlertController,
     public authProvider: AuthProvider,
-    formBuilder: FormBuilder
-  ) {
+    formBuilder: FormBuilder, public navParams: NavParams) {
     this.loginForm = formBuilder.group({
-      email: [
-        '',
-        Validators.compose([Validators.required, EmailValidator.isValid])
-      ],
-      password: [
-        '',
-        Validators.compose([Validators.required, Validators.minLength(6)])
-      ]
+      email: [ '', Validators.compose([Validators.required, EmailValidator.isValid])],
+      password: ['', Validators.compose([Validators.required, Validators.minLength(6)])]
     });
   }
-
-  goToSignup():void {
+  goToSignup(): void {
     this.navCtrl.push('SignupPage');
   }
-
-  goToResetPassword():void {
+  goToResetPassword(): void {
     this.navCtrl.push('ResetPasswordPage');
   }
-
   loginUser(): void {
     if (!this.loginForm.valid) {
       console.log(
@@ -55,7 +43,6 @@ public loading: Loading;
     } else {
       const email = this.loginForm.value.email;
       const password = this.loginForm.value.password;
-
       this.authProvider.loginUser(email, password).then(
         authData => {
           this.loading.dismiss().then(() => {
@@ -76,4 +63,8 @@ public loading: Loading;
       this.loading.present();
     }
   }
+  ionViewDidLoad() {
+    console.log('ionViewDidLoad LoginPage');
+  }
+
 }

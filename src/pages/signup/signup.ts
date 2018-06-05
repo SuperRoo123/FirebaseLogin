@@ -1,12 +1,12 @@
-import { Component } from "@angular/core";
+import { Component } from '@angular/core';
 import {
   Alert,
   AlertController,
   IonicPage,
   Loading,
   LoadingController,
-  NavController
-} from "ionic-angular";
+  NavController, NavParams } from 'ionic-angular';
+
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { AuthProvider } from "../../providers/auth/auth";
 import { EmailValidator } from "../../validators/email";
@@ -14,29 +14,22 @@ import { HomePage } from "../home/home";
 
 @IonicPage()
 @Component({
-  selector: "page-signup",
-  templateUrl: "signup.html"
+  selector: 'page-signup',
+  templateUrl: 'signup.html',
 })
 export class SignupPage {
+
   public signupForm: FormGroup;
   public loading: Loading;
 
-  constructor(
-    public navCtrl: NavController,
+  constructor(public navCtrl: NavController,
     public authProvider: AuthProvider,
     public loadingCtrl: LoadingController,
     public alertCtrl: AlertController,
-    formBuilder: FormBuilder
-  ) {
+    formBuilder: FormBuilder, public navParams: NavParams) {
     this.signupForm = formBuilder.group({
-      email: [
-        "",
-        Validators.compose([Validators.required, EmailValidator.isValid])
-      ],
-      password: [
-        "",
-        Validators.compose([Validators.minLength(6), Validators.required])
-      ]
+      email: [ "",Validators.compose([Validators.required, EmailValidator.isValid])],
+      password: [ "",Validators.compose([Validators.minLength(6), Validators.required])]
     });
   }
   signupUser(): void {
@@ -47,7 +40,6 @@ export class SignupPage {
     } else {
       const email: string = this.signupForm.value.email;
       const password: string = this.signupForm.value.password;
-
       this.authProvider.signupUser(email, password).then(
         user => {
           this.loading.dismiss().then(() => {
@@ -68,4 +60,8 @@ export class SignupPage {
       this.loading.present();
     }
   }
+  ionViewDidLoad() {
+    console.log('ionViewDidLoad SignupPage');
+  }
+
 }
