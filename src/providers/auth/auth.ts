@@ -1,32 +1,43 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import firebase from 'firebase';
+
+import firebase from 'firebase/app';
+import 'firebase/auth';
+import 'firebase/database';
 
 @Injectable()
 export class AuthProvider {
 
-  public fireAuth: firebase.auth.Auth;
-  public userProfileRef: firebase.database.Reference;
-
   constructor(public http: HttpClient) {
-    this.fireAuth = firebase.auth();
-    this.userProfileRef = firebase.database().ref('/userProfile');
+    console.log('Hello AuthProvider Provider');
   }
-  loginUser(email: string, password: string): Promise<void>{
-    return this.fireAuth.signInWithEmailAndPassword(email, password);
-  }
-  signupUser(email: string, password: string): Promise<void> {
-    return this.fireAuth.createUserWithEmailAndPassword(email, password)
-      .then(newUser => {
-        this.userProfileRef.child(newUser.uid).set({
-          email: email
-        });
+  loginUser(email: string, password: string): Promise<any> {
+    return firebase.auth().signInWithEmailAndPassword(email, password);
+   }
+  signupUser(email: string, password: string): Promise<any> {
+    return firebase
+      .auth()
+      .createUserWithEmailAndPassword(email, password)
+      .then(newUserCredential => {
+        firebase
+          .database()
+          .ref(`/userProfile/${newUserCredential.user.uid}/email`)
+          .set(email);
+      })
+      .catch(error => {
+        console.error(error);
+        throw new Error(error);
       });
   }
   resetPassword(email: string): Promise<void> {
-    return this.fireAuth.sendPasswordResetEmail(email);
+    return firebase.auth().sendPasswordResetEmail(email);
   }
   logoutUser(): Promise<void> {
-    return this.fireAuth.signOut();
+    const userId: string = firebase.auth().currentUser.uid;
+    firebase
+      .database()
+      .ref(`/userProfile/${userId}`)
+      .off();
+    return firebase.auth().signOut();
   }
 }
